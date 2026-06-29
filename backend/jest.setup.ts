@@ -1,0 +1,11 @@
+process.env.SESSION_SECRET = 'test-session-secret';
+process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
+process.env.GOOGLE_CLIENT_SECRET = 'test-google-client-secret';
+process.env.GOOGLE_CALLBACK_URL = 'http://localhost:3001/api/auth/google/callback';
+process.env.JIRA_CLIENT_ID = 'test-jira-client-id';
+process.env.JIRA_CLIENT_SECRET = 'test-jira-client-secret';
+process.env.JIRA_CALLBACK_URL = 'http://localhost:3001/api/jira/callback';
+process.env.JIRA_SERVICE_ACCOUNT_EMAIL = 'svc@example.com';
+process.env.JIRA_SERVICE_ACCOUNT_TOKEN = 'test-token';
+process.env.JIRA_SERVICE_BASE_URL = 'https://example.atlassian.net';
+process.env.API_KEY = 'test-api-key-123';
