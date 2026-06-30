@@ -30,6 +30,7 @@ export interface RecentTicket {
   title: string;
   url: string;
   createdAt: string;
+  severity?: Severity;
 }
 
 export interface AppUser {

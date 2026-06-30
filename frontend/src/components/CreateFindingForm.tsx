@@ -1,26 +1,35 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { apiFetch, ApiRequestError } from '../api/client';
 import type { FindingTicketPayload, FindingTicketResult, JiraProject } from '../../../shared/src/types';
 
 interface Props {
   projects: JiraProject[];
   selectedProjectKey: string;
-  onProjectChange: (key: string) => void;
+  onCreated?: (key: string) => void;
 }
 
 const SEVERITY_OPTIONS = [
-  { value: 'critical', label: 'Critical' },
-  { value: 'high', label: 'High' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'low', label: 'Low' },
+  { value: 'critical', label: 'Critical', color: 'text-red-600' },
+  { value: 'high', label: 'High', color: 'text-orange-500' },
+  { value: 'medium', label: 'Medium', color: 'text-yellow-500' },
+  { value: 'low', label: 'Low', color: 'text-blue-500' },
 ];
 
 const FINDING_TYPE_OPTIONS = [
@@ -37,15 +46,20 @@ const IDENTITY_TYPE_OPTIONS = [
   { value: 'oauth-app', label: 'OAuth App' },
 ];
 
-export function CreateFindingForm({ projects, selectedProjectKey, onProjectChange }: Props) {
+const EMPTY_FORM = {
+  title: '',
+  description: '',
+  severity: 'high' as FindingTicketPayload['severity'],
+  findingType: 'stale-credential' as FindingTicketPayload['findingType'],
+  identityType: 'service-account' as FindingTicketPayload['identityType'],
+};
+
+export function CreateFindingForm({ projects, selectedProjectKey, onCreated }: Props) {
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({
-    title: '',
-    description: '',
-    severity: 'high' as FindingTicketPayload['severity'],
-    findingType: 'stale-credential' as FindingTicketPayload['findingType'],
-    identityType: 'service-account' as FindingTicketPayload['identityType'],
-  });
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+
+  const selectedProject = projects.find((p) => p.key === selectedProjectKey);
 
   const { mutate: createFinding, isPending } = useMutation({
     mutationFn: (payload: FindingTicketPayload) =>
@@ -63,8 +77,10 @@ export function CreateFindingForm({ projects, selectedProjectKey, onProjectChang
           created
         </span>
       );
-      setForm({ title: '', description: '', severity: 'high', findingType: 'stale-credential', identityType: 'service-account' });
+      setForm(EMPTY_FORM);
+      setOpen(false);
       queryClient.invalidateQueries({ queryKey: ['jira', 'recent', selectedProjectKey] });
+      onCreated?.(result.key);
     },
     onError: (err) => {
       const msg = err instanceof ApiRequestError ? err.message : 'Failed to create ticket';
@@ -74,35 +90,36 @@ export function CreateFindingForm({ projects, selectedProjectKey, onProjectChang
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProjectKey) { toast.error('Select a Jira project first'); return; }
     if (!form.title.trim()) { toast.error('Title is required'); return; }
     createFinding({ projectKey: selectedProjectKey, ...form });
   };
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create NHI Finding</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <Label>Project</Label>
-            <Select value={selectedProjectKey} onValueChange={onProjectChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a project..." />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map((p) => (
-                  <SelectItem key={p.key} value={p.key}>
-                    {p.name} ({p.key})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+  const selectedSeverity = SEVERITY_OPTIONS.find((o) => o.value === form.severity);
 
-          <div className="space-y-1">
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button onClick={() => setOpen(true)} className="flex items-center gap-2">
+        <Plus className="h-4 w-4" />
+        Create Finding
+      </Button>
+
+      <DialogContent className="sm:max-w-[520px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            Create NHI Finding
+            {selectedProject && (
+              <Badge variant="secondary" className="font-mono text-xs">
+                {selectedProject.name} · {selectedProject.key}
+              </Badge>
+            )}
+          </DialogTitle>
+          <DialogDescription>
+            File a new Non-Human Identity finding ticket in Jira.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
@@ -113,11 +130,11 @@ export function CreateFindingForm({ projects, selectedProjectKey, onProjectChang
             />
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Details about the finding..."
+              placeholder="Details about the finding…"
               rows={3}
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -125,43 +142,75 @@ export function CreateFindingForm({ projects, selectedProjectKey, onProjectChang
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="space-y-1">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
               <Label>Severity</Label>
-              <Select value={form.severity} onValueChange={(v) => setForm((f) => ({ ...f, severity: v as FindingTicketPayload['severity'] }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.severity}
+                onValueChange={(v) => setForm((f) => ({ ...f, severity: v as FindingTicketPayload['severity'] }))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue>
+                    {selectedSeverity && (
+                      <span className={selectedSeverity.color}>{selectedSeverity.label}</span>
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
                 <SelectContent>
-                  {SEVERITY_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  {SEVERITY_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>
+                      <span className={o.color}>{o.label}</span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <Label>Finding Type</Label>
-              <Select value={form.findingType} onValueChange={(v) => setForm((f) => ({ ...f, findingType: v as FindingTicketPayload['findingType'] }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.findingType}
+                onValueChange={(v) => setForm((f) => ({ ...f, findingType: v as FindingTicketPayload['findingType'] }))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {FINDING_TYPE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1">
-              <Label>Identity Type</Label>
-              <Select value={form.identityType} onValueChange={(v) => setForm((f) => ({ ...f, identityType: v as FindingTicketPayload['identityType'] }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {IDENTITY_TYPE_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  {FINDING_TYPE_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isPending || !selectedProjectKey}>
-            {isPending ? 'Creating...' : 'Create Finding Ticket'}
-          </Button>
+          <div className="space-y-1.5">
+            <Label>Identity Type</Label>
+            <Select
+              value={form.identityType}
+              onValueChange={(v) => setForm((f) => ({ ...f, identityType: v as FindingTicketPayload['identityType'] }))}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {IDENTITY_TYPE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <DialogFooter className="pt-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating…' : 'Create Ticket'}
+            </Button>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

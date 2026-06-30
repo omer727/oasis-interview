@@ -13,7 +13,7 @@ router.get('/connect', requireAuth, (req: Request, res: Response) => {
   const params = new URLSearchParams({
     audience: 'api.atlassian.com',
     client_id: config.jira.clientId,
-    scope: 'read:jira-work write:jira-work offline_access',
+    scope: 'read:jira-work write:jira-work read:issue-details:jira offline_access',
     redirect_uri: config.jira.callbackUrl,
     state,
     response_type: 'code',

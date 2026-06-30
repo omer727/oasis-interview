@@ -7,6 +7,17 @@ const SEVERITY_PRIORITY: Record<Severity, string> = {
   low: 'Low',
 };
 
+const PRIORITY_SEVERITY: Record<string, Severity> = {
+  Highest: 'critical',
+  High: 'high',
+  Medium: 'medium',
+  Low: 'low',
+};
+
+export function priorityToSeverity(priorityName: string): Severity | undefined {
+  return PRIORITY_SEVERITY[priorityName];
+}
+
 function toAdf(text: string) {
   return {
     type: 'doc',

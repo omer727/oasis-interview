@@ -6,7 +6,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "rootDir": "src",
     "paths": {
       "@identityhub/shared": ["../shared/src/types.ts"]
     }

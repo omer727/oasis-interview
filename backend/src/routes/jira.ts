@@ -14,8 +14,9 @@ router.get('/projects', requireAuth, requireJiraConnected, async (req: Request, 
   try {
     const projects = await getJiraClient(req).getProjects();
     res.json(projects);
-  } catch (err) {
-    console.error('Failed to fetch Jira projects:', err);
+  } catch (err: unknown) {
+    const axiosErr = err as { response?: { status?: number; data?: unknown } };
+    console.error('Failed to fetch Jira projects:', JSON.stringify(axiosErr?.response?.data ?? err));
     res.status(502).json({ error: { code: 'JIRA_ERROR', message: 'Failed to fetch projects from Jira' } });
   }
 });
@@ -45,8 +46,9 @@ router.get('/projects/:projectKey/recent-findings', requireAuth, requireJiraConn
   try {
     const tickets = await getJiraClient(req).getRecentFindings(projectKey);
     res.json(tickets);
-  } catch (err) {
-    console.error('Failed to fetch recent findings:', err);
+  } catch (err: unknown) {
+    const axiosErr = err as { response?: { status?: number; data?: unknown } };
+    console.error('Failed to fetch recent findings [%s]:', axiosErr?.response?.status, JSON.stringify(axiosErr?.response?.data ?? err));
     res.status(502).json({ error: { code: 'JIRA_ERROR', message: 'Failed to fetch recent tickets from Jira' } });
   }
 });
