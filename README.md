@@ -30,11 +30,13 @@ cp .env.example .env
 Fill in `.env`:
 
 **Google OAuth** — https://console.cloud.google.com/apis/credentials
+
 - Create an OAuth 2.0 Client ID (Web application)
 - Add authorized redirect URI: `http://localhost:3001/api/auth/google/callback`
 - Copy `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` into `.env`
 
 **Jira OAuth** — https://developer.atlassian.com/console/myapps/
+
 - Create an OAuth 2.0 (3LO) integration
 - Add callback URL: `http://localhost:3001/api/jira/callback`
 - Scopes: `read:jira-work`, `write:jira-work`, `offline_access`
@@ -42,6 +44,7 @@ Fill in `.env`:
 - Copy `JIRA_CLIENT_ID` and `JIRA_CLIENT_SECRET` into `.env`
 
 **Jira Service Account** — for the REST API
+
 - Create or use an existing Atlassian user as a service account
 - Generate an API token at https://id.atlassian.com/manage-profile/security/api-tokens
 - The service account must be a member of the Jira projects you intend to use
@@ -92,18 +95,31 @@ curl -X POST http://localhost:3001/api/v1/findings \
 ```
 
 **Valid values:**
+
 - `severity`: `critical` | `high` | `medium` | `low`
 - `findingType`: `stale-credential` | `overprivileged` | `expiring-credential` | `misconfigured`
 - `identityType`: `service-account` | `api-key` | `service-principal` | `oauth-app`
 
 **Response (201):**
+
 ```json
-{ "id": "10042", "key": "OPS-17", "url": "https://...atlassian.net/browse/OPS-17", "createdAt": "2026-06-29T10:00:00Z" }
+{
+  "id": "10042",
+  "key": "OPS-17",
+  "url": "https://...atlassian.net/browse/OPS-17",
+  "createdAt": "2026-06-29T10:00:00Z"
+}
 ```
 
 **Error shape (all errors):**
+
 ```json
-{ "error": { "code": "SCREAMING_SNAKE_CASE", "message": "human-readable string" } }
+{
+  "error": {
+    "code": "SCREAMING_SNAKE_CASE",
+    "message": "human-readable string"
+  }
+}
 ```
 
 ## Architecture decisions
@@ -125,7 +141,8 @@ See `docs/adr/` for recorded decisions:
 cd backend && npm test
 ```
 
-14 tests covering:
+28 tests covering:
+
 - `requireAuth` middleware: unauthenticated → 401
 - `requireApiKey` middleware: missing/wrong key → 401
 - `POST /api/v1/findings` validation: invalid enum, empty title → 400
