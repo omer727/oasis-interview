@@ -19,6 +19,10 @@ npm run install:all
 
 ### 2. Configure credentials
 
+**If you received a `.env` file by email**, place it in the project root (next to `package.json`) and skip to step 3. All credentials are pre-configured.
+
+**Otherwise**, create one from the template:
+
 ```bash
 cp .env.example .env
 ```
