@@ -38,6 +38,7 @@ Fill in `.env`:
 - Create an OAuth 2.0 (3LO) integration
 - Add callback URL: `http://localhost:3001/api/jira/callback`
 - Scopes: `read:jira-work`, `write:jira-work`, `offline_access`
+- Under **Distribution**, set to **Sharing** (the default Development mode only allows the app owner to authorise — any other Atlassian account will be blocked)
 - Copy `JIRA_CLIENT_ID` and `JIRA_CLIENT_SECRET` into `.env`
 
 **Jira Service Account** — for the REST API
@@ -115,6 +116,7 @@ See `docs/adr/` for recorded decisions:
 - [ADR-0004](docs/adr/0004-jira-label-strategy-for-ticket-tracking.md): Jira label strategy for ticket tracking
 - [ADR-0005](docs/adr/0005-single-env-var-api-key.md): Single shared API key
 - [ADR-0006](docs/adr/0006-standard-jira-fields-only.md): Standard Jira fields only
+- [ADR-0007](docs/adr/0007-ux-decisions-dashboard.md): UX decisions — dashboard interactions and visual polish
 
 ## Tests
 

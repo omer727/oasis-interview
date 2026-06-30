@@ -30,7 +30,9 @@ export function Header() {
 
   return (
     <header className="border-b border-[#e2e4f3] bg-white px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
+        <img src="/oasis-logo.svg" alt="Oasis" className="h-4 text-[#0d0d19]" style={{ color: '#0d0d19' }} />
+        <span className="w-px h-5 bg-[#e2e4f3]" />
         <h1 className="text-lg font-bold tracking-tight">
           <span className="text-[#0d0d19]">Identity</span>
           <span className="text-[#4f5cd6]">Hub</span>

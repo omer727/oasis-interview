@@ -24,6 +24,9 @@ export function LoginPage() {
       />
       <Card className="w-full max-w-md relative shadow-lg border-[#e2e4f3]">
         <CardHeader className="text-center pb-4">
+          <div className="flex items-center justify-center mb-3">
+            <img src="/oasis-logo.svg" alt="Oasis" className="h-5" style={{ color: '#0d0d19' }} />
+          </div>
           <div className="flex items-center justify-center gap-2 mb-1">
             <span className="text-2xl font-bold text-[#0d0d19]">Identity</span>
             <span className="text-2xl font-bold text-[#4f5cd6]">Hub</span>
