@@ -64,11 +64,13 @@ export function Dashboard() {
                 </Select>
               </div>
 
-              <CreateFindingForm
-                projects={projects}
-                selectedProjectKey={selectedProjectKey}
-                onCreated={handleCreated}
-              />
+              <div className="ml-auto">
+                <CreateFindingForm
+                  projects={projects}
+                  selectedProjectKey={selectedProjectKey}
+                  onCreated={handleCreated}
+                />
+              </div>
 
               {projectsLoading && (
                 <span className="text-sm text-slate-400">Loading projects…</span>
