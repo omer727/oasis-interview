@@ -18,7 +18,7 @@ export function priorityToSeverity(priorityName: string): Severity | undefined {
   return PRIORITY_SEVERITY[priorityName];
 }
 
-function toAdf(text: string) {
+export function toAdf(text: string) {
   return {
     type: 'doc',
     version: 1,

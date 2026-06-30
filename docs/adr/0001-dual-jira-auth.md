@@ -5,3 +5,7 @@ The app has two paths to Jira: interactive users authenticate via OAuth 2.0 (3LO
 ## Consequences
 
 The service account must be a member of every Jira project callers intend to target. This is a deployment concern, not a code concern — document it in the README.
+
+## Atlassian OAuth app distribution
+
+The Jira OAuth app must be set to **Sharing** distribution in the Atlassian developer console (`developer.atlassian.com/console/myapps`). The default **Development** mode restricts authorization to the app owner's account only — any other Atlassian user receives "You don't have access to this app." Sharing mode lifts this restriction without requiring individual users to be whitelisted; any Atlassian account can authorize the app.

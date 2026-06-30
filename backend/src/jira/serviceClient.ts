@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { FindingTicketPayload, FindingTicketResult } from '@identityhub/shared';
-import { buildJiraIssueFields } from './mappers';
+import { buildJiraIssueFields, toAdf } from './mappers';
 
 export class JiraServiceClient {
   private http: AxiosInstance;
@@ -27,5 +27,27 @@ export class JiraServiceClient {
       url: `${this.baseUrl}/browse/${res.data.key}`,
       createdAt: new Date().toISOString(),
     };
+  }
+
+  async ticketExistsForLabel(label: string): Promise<boolean> {
+    const res = await this.http.post('/search/jql', {
+      jql: `labels = "${label}"`,
+      maxResults: 1,
+      fields: ['id'],
+    });
+    return res.data.issues.length > 0;
+  }
+
+  async createDigestTicket(title: string, summary: string, projectKey: string, label: string): Promise<string> {
+    const res = await this.http.post('/issue', {
+      fields: {
+        project: { key: projectKey },
+        summary: title,
+        description: toAdf(summary),
+        issuetype: { name: 'Task' },
+        labels: ['identityhub', label],
+      },
+    });
+    return `${this.baseUrl}/browse/${res.data.key}`;
   }
 }

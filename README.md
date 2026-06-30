@@ -117,6 +117,7 @@ See `docs/adr/` for recorded decisions:
 - [ADR-0005](docs/adr/0005-single-env-var-api-key.md): Single shared API key
 - [ADR-0006](docs/adr/0006-standard-jira-fields-only.md): Standard Jira fields only
 - [ADR-0007](docs/adr/0007-ux-decisions-dashboard.md): UX decisions — dashboard interactions and visual polish
+- [ADR-0008](docs/adr/0008-nhi-blog-digest-automation.md): NHI Blog Digest automation — scraping, deduplication, AI summarisation, and scheduling
 
 ## Tests
 

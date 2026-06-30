@@ -25,4 +25,8 @@ export const config = {
     baseUrl: requireEnv('JIRA_SERVICE_BASE_URL'),
   },
   apiKey: requireEnv('API_KEY'),
+  digest: {
+    claudeApiKey: process.env.CLAUDE_API_KEY,
+    projectKey: process.env.JIRA_BLOG_DIGEST_PROJECT_KEY,
+  },
 };
